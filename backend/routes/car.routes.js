@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const Shape = require("../models/Shape");
+const Car = require("../models/Car");
 
-// GET - Obtener todas las figuras
+// GET - Obtener todos los vehículos
 router.get("/", (req, res) => {
-    Shape.find()
+    Car.find()
         .then(data => {
             res.json(data);
         })
@@ -13,12 +13,12 @@ router.get("/", (req, res) => {
         });
 });
 
-// GET - Obtener una figura por ID
+// GET - Obtener un vehículo por ID
 router.get("/:id", (req, res) => {
-    Shape.findById(req.params.id)
+    Car.findById(req.params.id)
         .then(data => {
             if (!data) {
-                return res.status(404).json("Figura no encontrada");
+                return res.status(404).json("Vehículo no encontrado");
             }
             res.json(data);
         })
@@ -27,14 +27,16 @@ router.get("/:id", (req, res) => {
         });
 });
 
-// POST - Crear una nueva figura
+// POST - Crear un nuevo vehículo
 router.post("/", (req, res) => {
-    const newShape = new Shape({
-        name: req.body.name,
-        points: req.body.points
+    const newCar = new Car({
+        brand: req.body.brand,
+        model: req.body.model,
+        year: req.body.year,
+        capacity: req.body.capacity
     });
 
-    newShape.save()
+    newCar.save()
         .then(data => {
             res.json(data);
         })
@@ -43,14 +45,16 @@ router.post("/", (req, res) => {
         });
 });
 
-// PATCH - Actualizar una figura por ID
+// PATCH - Actualizar un vehículo
 router.patch("/:id", (req, res) => {
-    Shape.updateOne(
+    Car.updateOne(
         { _id: req.params.id },
         {
             $set: {
-                name: req.body.name,
-                points: req.body.points
+                brand: req.body.brand,
+                model: req.body.model,
+                year: req.body.year,
+                capacity: req.body.capacity
             }
         }
     )
@@ -62,9 +66,9 @@ router.patch("/:id", (req, res) => {
         });
 });
 
-// DELETE - Eliminar una figura por ID
+// DELETE - Eliminar un vehículo
 router.delete("/:id", (req, res) => {
-    Shape.deleteOne({ _id: req.params.id })
+    Car.deleteOne({ _id: req.params.id })
         .then(data => {
             res.json(data);
         })
