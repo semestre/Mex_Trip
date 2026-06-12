@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const Product = require("../models/Product");
+const Destination = require("../models/Destination");
 
-// GET - Obtener todos los productos
+// GET - Obtener todos los destinos
 router.get("/", (req, res) => {
-    Product.find()
+    Destination.find().populate("car")
         .then(data => {
             res.json(data);
         })
@@ -13,12 +13,12 @@ router.get("/", (req, res) => {
         });
 });
 
-// GET - Obtener un producto por ID
+// GET - Obtener un destino por ID
 router.get("/:id", (req, res) => {
-    Product.findById(req.params.id)
+    Destination.findById(req.params.id).populate("car")
         .then(data => {
             if (!data) {
-                return res.status(404).json("Producto no encontrado");
+                return res.status(404).json("Destino no encontrado");
             }
             res.json(data);
         })
@@ -27,16 +27,29 @@ router.get("/:id", (req, res) => {
         });
 });
 
-// POST - Crear un producto
+// POST - Crear un nuevo destino
 router.post("/", (req, res) => {
-    const newProduct = new Product({
+    const newDestination = new Destination({
         name: req.body.name,
         description: req.body.description,
-        price: req.body.price,
-        image: req.body.image
+        duration: req.body.duration,
+
+        pointA: {
+            latitude: req.body.pointA.latitude,
+            longitude: req.body.pointA.longitude
+        },
+
+        pointB: {
+            latitude: req.body.pointB.latitude,
+            longitude: req.body.pointB.longitude
+        },
+
+        schedule: req.body.schedule,
+
+        car: req.body.car
     });
 
-    newProduct.save()
+    newDestination.save()
         .then(data => {
             res.json(data);
         })
@@ -45,16 +58,29 @@ router.post("/", (req, res) => {
         });
 });
 
-// PATCH - Actualizar un producto
+// PATCH - Actualizar un destino
 router.patch("/:id", (req, res) => {
-    Product.updateOne(
+    Destination.updateOne(
         { _id: req.params.id },
         {
             $set: {
                 name: req.body.name,
                 description: req.body.description,
-                price: req.body.price,
-                image: req.body.image
+                duration: req.body.duration,
+
+                pointA: {
+                    latitude: req.body.pointA.latitude,
+                    longitude: req.body.pointA.longitude
+                },
+
+                pointB: {
+                    latitude: req.body.pointB.latitude,
+                    longitude: req.body.pointB.longitude
+                },
+
+                schedule: req.body.schedule,
+
+                car: req.body.car
             }
         }
     )
@@ -66,9 +92,9 @@ router.patch("/:id", (req, res) => {
         });
 });
 
-// DELETE - Eliminar un producto
+// DELETE - Eliminar un destino
 router.delete("/:id", (req, res) => {
-    Product.deleteOne({ _id: req.params.id })
+    Destination.deleteOne({ _id: req.params.id })
         .then(data => {
             res.json(data);
         })
