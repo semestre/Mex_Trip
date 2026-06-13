@@ -1,43 +1,70 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
+
+const authService = require("../services/auth.service");
 
 // POST - Registrar usuario
-router.post("/register", (req, res) => {
-    const newUser = new User({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password
-    });
+router.post("/register", async (req, res) => {
+    try {
 
-    newUser.save()
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+        const { username, email, password } = req.body;
+
+        // Validation
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                message: "Todos los campos son obligatorios"
+            });
+        }
+
+        const user = await authService.registerUser({
+            username,
+            email,
+            password
         });
+
+        res.json(user);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
 // POST - Iniciar sesión
-router.post("/login", (req, res) => {
-    User.findOne({
-        email: req.body.email,
-        password: req.body.password
-    })
-        .then(user => {
-            if (!user) {
-                return res.status(401).json("Credenciales incorrectas");
-            }
+router.post("/login", async (req, res) => {
+    try {
 
-            res.json({
-                message: "Login exitoso",
-                user
+        const { email, password } = req.body;
+
+        // Validation
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email y contraseña son obligatorios"
             });
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+        }
+
+        const user = await authService.loginUser(
+            email,
+            password
+        );
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Credenciales incorrectas"
+            });
+        }
+
+        res.json({
+            message: "Login exitoso",
+            user
         });
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
 module.exports = router;

@@ -1,80 +1,110 @@
 const express = require("express");
 const router = express.Router();
-const Car = require("../models/Car");
+
+const carService = require("../services/car.service");
 
 // GET - Obtener todos los vehículos
-router.get("/", (req, res) => {
-    Car.find()
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+router.get("/", async (req, res) => {
+    try {
+        const cars = await carService.getAllCars();
+        res.json(cars);
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
 });
 
 // GET - Obtener un vehículo por ID
-router.get("/:id", (req, res) => {
-    Car.findById(req.params.id)
-        .then(data => {
-            if (!data) {
-                return res.status(404).json("Vehículo no encontrado");
-            }
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+router.get("/:id", async (req, res) => {
+    try {
+        const car = await carService.getCarById(req.params.id);
+
+        if (!car) {
+            return res.status(404).json({
+                message: "Vehículo no encontrado"
+            });
+        }
+
+        res.json(car);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
 });
 
 // POST - Crear un nuevo vehículo
-router.post("/", (req, res) => {
-    const newCar = new Car({
-        brand: req.body.brand,
-        model: req.body.model,
-        year: req.body.year,
-        capacity: req.body.capacity
-    });
+router.post("/", async (req, res) => {
+    try {
 
-    newCar.save()
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
-        });
-});
+        const { brand, model, year, capacity } = req.body;
 
-// PATCH - Actualizar un vehículo
-router.patch("/:id", (req, res) => {
-    Car.updateOne(
-        { _id: req.params.id },
-        {
-            $set: {
-                brand: req.body.brand,
-                model: req.body.model,
-                year: req.body.year,
-                capacity: req.body.capacity
-            }
+        // Validation
+        if (!brand || !model || !year || !capacity) {
+            return res.status(400).json({
+                message: "Todos los campos son obligatorios"
+            });
         }
-    )
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+
+        const car = await carService.createCar({
+            brand,
+            model,
+            year,
+            capacity
         });
+
+        res.json(car);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
-// DELETE - Eliminar un vehículo
-router.delete("/:id", (req, res) => {
-    Car.deleteOne({ _id: req.params.id })
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+// PATCH - Actualizar vehículo
+router.patch("/:id", async (req, res) => {
+    try {
+
+        const { brand, model, year, capacity } = req.body;
+
+        if (!brand || !model || !year || !capacity) {
+            return res.status(400).json({
+                message: "Todos los campos son obligatorios"
+            });
+        }
+
+        const result = await carService.updateCar(
+            req.params.id,
+            req.body
+        );
+
+        res.json(result);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
+});
+
+// DELETE - Eliminar vehículo
+router.delete("/:id", async (req, res) => {
+    try {
+
+        const result = await carService.deleteCar(
+            req.params.id
+        );
+
+        res.json(result);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
 module.exports = router;
