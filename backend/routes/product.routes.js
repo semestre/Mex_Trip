@@ -1,80 +1,110 @@
 const express = require("express");
 const router = express.Router();
-const Product = require("../models/Product");
+
+const productService = require("../services/product.service");
 
 // GET - Obtener todos los productos
-router.get("/", (req, res) => {
-    Product.find()
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+router.get("/", async (req, res) => {
+    try {
+
+        const products =
+            await productService.getAllProducts();
+
+        res.json(products);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
 });
 
 // GET - Obtener un producto por ID
-router.get("/:id", (req, res) => {
-    Product.findById(req.params.id)
-        .then(data => {
-            if (!data) {
-                return res.status(404).json("Producto no encontrado");
-            }
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
-        });
-});
+router.get("/:id", async (req, res) => {
+    try {
 
-// POST - Crear un producto
-router.post("/", (req, res) => {
-    const newProduct = new Product({
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        image: req.body.image
-    });
+        const product =
+            await productService.getProductById(req.params.id);
 
-    newProduct.save()
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
-        });
-});
-
-// PATCH - Actualizar un producto
-router.patch("/:id", (req, res) => {
-    Product.updateOne(
-        { _id: req.params.id },
-        {
-            $set: {
-                name: req.body.name,
-                description: req.body.description,
-                price: req.body.price,
-                image: req.body.image
-            }
+        if (!product) {
+            return res.status(404).json({
+                message: "Producto no encontrado"
+            });
         }
-    )
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+
+        res.json(product);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
 });
 
-// DELETE - Eliminar un producto
-router.delete("/:id", (req, res) => {
-    Product.deleteOne({ _id: req.params.id })
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+// POST - Crear producto
+router.post("/", async (req, res) => {
+    try {
+
+        const {
+            name,
+            price,
+            image
+        } = req.body;
+
+        // Validation
+        if (!name || !price || !image) {
+            return res.status(400).json({
+                message: "Nombre, precio e imagen son obligatorios"
+            });
+        }
+
+        const product =
+            await productService.createProduct(req.body);
+
+        res.json(product);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
+});
+
+// PATCH - Actualizar producto
+router.patch("/:id", async (req, res) => {
+    try {
+
+        const result =
+            await productService.updateProduct(
+                req.params.id,
+                req.body
+            );
+
+        res.json(result);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
+});
+
+// DELETE - Eliminar producto
+router.delete("/:id", async (req, res) => {
+    try {
+
+        const result =
+            await productService.deleteProduct(
+                req.params.id
+            );
+
+        res.json(result);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
 module.exports = router;

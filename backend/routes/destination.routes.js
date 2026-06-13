@@ -1,106 +1,119 @@
 const express = require("express");
 const router = express.Router();
-const Destination = require("../models/Destination");
+
+const destinationService = require("../services/destination.service");
 
 // GET - Obtener todos los destinos
-router.get("/", (req, res) => {
-    Destination.find().populate("car")
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+router.get("/", async (req, res) => {
+    try {
+        const destinations =
+            await destinationService.getAllDestinations();
+
+        res.json(destinations);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
 });
 
 // GET - Obtener un destino por ID
-router.get("/:id", (req, res) => {
-    Destination.findById(req.params.id).populate("car")
-        .then(data => {
-            if (!data) {
-                return res.status(404).json("Destino no encontrado");
-            }
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
-        });
-});
+router.get("/:id", async (req, res) => {
+    try {
 
-// POST - Crear un nuevo destino
-router.post("/", (req, res) => {
-    const newDestination = new Destination({
-        name: req.body.name,
-        description: req.body.description,
-        duration: req.body.duration,
+        const destination =
+            await destinationService.getDestinationById(req.params.id);
 
-        pointA: {
-            latitude: req.body.pointA.latitude,
-            longitude: req.body.pointA.longitude
-        },
-
-        pointB: {
-            latitude: req.body.pointB.latitude,
-            longitude: req.body.pointB.longitude
-        },
-
-        schedule: req.body.schedule,
-
-        car: req.body.car
-    });
-
-    newDestination.save()
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
-        });
-});
-
-// PATCH - Actualizar un destino
-router.patch("/:id", (req, res) => {
-    Destination.updateOne(
-        { _id: req.params.id },
-        {
-            $set: {
-                name: req.body.name,
-                description: req.body.description,
-                duration: req.body.duration,
-
-                pointA: {
-                    latitude: req.body.pointA.latitude,
-                    longitude: req.body.pointA.longitude
-                },
-
-                pointB: {
-                    latitude: req.body.pointB.latitude,
-                    longitude: req.body.pointB.longitude
-                },
-
-                schedule: req.body.schedule,
-
-                car: req.body.car
-            }
+        if (!destination) {
+            return res.status(404).json({
+                message: "Destino no encontrado"
+            });
         }
-    )
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+
+        res.json(destination);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
 });
 
-// DELETE - Eliminar un destino
-router.delete("/:id", (req, res) => {
-    Destination.deleteOne({ _id: req.params.id })
-        .then(data => {
-            res.json(data);
-        })
-        .catch(err => {
-            res.status(400).json("Error: " + err);
+// POST - Crear destino
+router.post("/", async (req, res) => {
+    try {
+
+        const {
+            name,
+            duration,
+            pointA,
+            pointB,
+            schedule,
+            car
+        } = req.body;
+
+        // Validation
+        if (
+            !name ||
+            !duration ||
+            !pointA ||
+            !pointB ||
+            !schedule ||
+            !car
+        ) {
+            return res.status(400).json({
+                message: "Todos los campos obligatorios deben completarse"
+            });
+        }
+
+        const destination =
+            await destinationService.createDestination(req.body);
+
+        res.json(destination);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
+    }
+});
+
+// PATCH - Actualizar destino
+router.patch("/:id", async (req, res) => {
+    try {
+
+        const result =
+            await destinationService.updateDestination(
+                req.params.id,
+                req.body
+            );
+
+        res.json(result);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
+});
+
+// DELETE - Eliminar destino
+router.delete("/:id", async (req, res) => {
+    try {
+
+        const result =
+            await destinationService.deleteDestination(
+                req.params.id
+            );
+
+        res.json(result);
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
 module.exports = router;

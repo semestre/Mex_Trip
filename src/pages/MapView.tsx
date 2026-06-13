@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { MapContainer, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function MapView() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -22,10 +24,10 @@ export default function MapView() {
   ];
 
   return (
-    <div 
-      className="container-fluid min-vh-100 p-0 text-white d-flex overflow-hidden" 
-      style={{ 
-        backgroundImage: 'url("https://i.pinimg.com/736x/e2/59/80/e25980535739417b5a3854943f9bf78e.jpg")', 
+    <div
+      className="container-fluid min-vh-100 p-0 text-white d-flex overflow-hidden"
+      style={{
+        backgroundImage: 'url("https://i.pinimg.com/736x/e2/59/80/e25980535739417b5a3854943f9bf78e.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -33,16 +35,16 @@ export default function MapView() {
     >
       {/* Capa global oscura */}
       <div className="d-flex w-100 min-vh-100" style={{ backgroundColor: 'rgba(5, 10, 20, 0.85)', backdropFilter: 'blur(12px)' }}>
-        
+
         {/* =========================================================
             BARRA LATERAL (SIDEBAR) - Dark Glass
            ========================================================= */}
-        <aside 
+        <aside
           className="p-3 border-end border-white border-opacity-10 d-flex flex-column transition-all shadow-lg z-3"
-          style={{ 
-            width: sidebarOpen ? '260px' : '85px', 
+          style={{
+            width: sidebarOpen ? '260px' : '85px',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            backgroundColor: 'rgba(15, 23, 42, 0.6)', 
+            backgroundColor: 'rgba(15, 23, 42, 0.6)',
             backdropFilter: 'blur(20px)'
           }}
         >
@@ -54,7 +56,7 @@ export default function MapView() {
                 <h4 className="m-0 fw-extrabold tracking-tight text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>MexTrip</h4>
               </div>
             )}
-            <button 
+            <button
               className="btn btn-sm btn-outline-light border-0 opacity-75 hover-opacity-100"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
@@ -67,17 +69,16 @@ export default function MapView() {
             {menuItems.map((item, index) => (
               <button
                 key={index}
-                className={`btn text-start text-white border-0 d-flex align-items-center gap-3 p-3 w-100 transition-all ${
-                  item.active ? 'bg-primary bg-opacity-25 fw-bold border-start border-primary border-4' : 'bg-transparent opacity-75'
-                }`}
-                style={{ 
+                className={`btn text-start text-white border-0 d-flex align-items-center gap-3 p-3 w-100 transition-all ${item.active ? 'bg-primary bg-opacity-25 fw-bold border-start border-primary border-4' : 'bg-transparent opacity-75'
+                  }`}
+                style={{
                   borderRadius: item.active ? '0 16px 16px 0' : '16px',
                   fontFamily: "'Poppins', sans-serif",
                   fontSize: '14px',
                   boxShadow: 'none'
                 }}
-                onMouseOver={(e) => { if(!item.active) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)' }}
-                onMouseOut={(e) => { if(!item.active) e.currentTarget.style.backgroundColor = 'transparent' }}
+                onMouseOver={(e) => { if (!item.active) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)' }}
+                onMouseOut={(e) => { if (!item.active) e.currentTarget.style.backgroundColor = 'transparent' }}
               >
                 <i className={`bi ${item.icon} fs-5 ${item.active ? 'text-primary' : ''}`}></i>
                 {sidebarOpen && <span className="animate__animated animate__fadeIn">{item.name}</span>}
@@ -103,7 +104,7 @@ export default function MapView() {
             CONTENEDOR DE CONTENIDO PRINCIPAL (MAPA Y LISTA)
            ========================================================= */}
         <div className="flex-grow-1 d-flex flex-column h-100 overflow-hidden p-3 p-md-4 pb-5">
-          
+
           {/* NAVBAR SUPERIOR */}
           <header className="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom border-white border-opacity-10">
             <div>
@@ -117,13 +118,13 @@ export default function MapView() {
 
           {/* ÁREA DEL MAPA (SPLIT SCREEN) */}
           <div className="row g-3 flex-grow-1 pb-4">
-            
+
             {/* Panel Izquierdo: Buscador y Lista de Unidades */}
             <div className="col-12 col-lg-4 col-xl-3 d-flex flex-column h-100">
-              <div 
+              <div
                 className="card border border-white border-opacity-10 h-100 d-flex flex-column shadow"
-                style={{ 
-                  backgroundColor: 'rgba(30, 41, 59, 0.8)', 
+                style={{
+                  backgroundColor: 'rgba(30, 41, 59, 0.8)',
                   borderRadius: '20px',
                   backdropFilter: 'blur(15px)',
                 }}
@@ -132,21 +133,21 @@ export default function MapView() {
                 <div className="p-3 border-bottom border-white border-opacity-10">
                   <div className="position-relative">
                     {/* 🌟 Se agregó el color gris claro al icono explícitamente */}
-                    <span 
-                      className="position-absolute top-50 start-0 translate-middle-y ms-3" 
+                    <span
+                      className="position-absolute top-50 start-0 translate-middle-y ms-3"
                       style={{ color: '#adb5bd', zIndex: 5 }}
                     >
                       <i className="bi bi-search"></i>
                     </span>
-                    
-                    <input 
-                      type="text" 
-                      className="form-control ps-5 border-white border-opacity-20 shadow-none" 
+
+                    <input
+                      type="text"
+                      className="form-control ps-5 border-white border-opacity-20 shadow-none"
                       placeholder="Buscar unidad o ciudad..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      style={{ 
-                        borderRadius: '12px', 
+                      style={{
+                        borderRadius: '12px',
                         backgroundColor: 'rgba(15, 23, 42, 0.6)',
                         color: '#ffffff', // 🌟 Fuerza a que el texto que escribas sea blanco brillante
                       }}
@@ -164,9 +165,9 @@ export default function MapView() {
                       <button
                         key={loc.id}
                         className="btn text-start p-3 border border-white border-opacity-10 transition-all text-white w-100"
-                        style={{ 
-                          backgroundColor: 'rgba(255, 255, 255, 0.03)', 
-                          borderRadius: '14px' 
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                          borderRadius: '14px'
                         }}
                         onMouseOver={(e) => {
                           e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
@@ -195,41 +196,26 @@ export default function MapView() {
 
             {/* Panel Derecho: Contenedor del Mapa (Simulación Dark Mode) */}
             <div className="col-12 col-lg-8 col-xl-9 h-100 position-relative">
-              <div 
-                className="w-100 h-100 rounded border border-white border-opacity-10 shadow-lg position-relative overflow-hidden d-flex flex-column align-items-center justify-content-center text-center"
-                style={{ 
-                  borderRadius: '20px',
-                  backgroundColor: '#0f172a', // Fondo oscuro del mapa
-                  backgroundImage: 'radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px)', 
-                  backgroundSize: '24px 24px' // Efecto de rejilla de mapa topográfico
+              <div
+                className="w-100 h-100 rounded border border-white border-opacity-10 shadow-lg overflow-hidden"
+                style={{
+                  borderRadius: "20px",
+                  minHeight: "600px"
                 }}
               >
-                {/* Contenido Simulado del Mapa */}
-                <div className="p-4" style={{ maxWidth: '400px' }}>
-                  <div className="mb-3">
-                    <i className="bi bi-map text-primary opacity-75" style={{ fontSize: '4rem' }}></i>
-                  </div>
-                  <h4 className="fw-bold text-white mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Contenedor del Mapa</h4>
-                  <p className="opacity-75 small">
-                    Aquí integrarás tu librería de mapas (como Leaflet, Mapbox o Google Maps). El contenedor ya ocupa el 100% del espacio con bordes redondeados y soporte Dark Mode.
-                  </p>
-                </div>
-
-                {/* Controles Flotantes del Mapa */}
-                <div className="position-absolute bottom-0 end-0 m-4 d-flex flex-column gap-2">
-                  <button className="btn btn-dark border border-white border-opacity-20 shadow-lg d-flex align-items-center justify-content-center" style={{ width: '45px', height: '45px', borderRadius: '12px', backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)' }}>
-                    <i className="bi bi-plus-lg fs-5"></i>
-                  </button>
-                  <button className="btn btn-dark border border-white border-opacity-20 shadow-lg d-flex align-items-center justify-content-center" style={{ width: '45px', height: '45px', borderRadius: '12px', backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)' }}>
-                    <i className="bi bi-dash-lg fs-5"></i>
-                  </button>
-                </div>
-
-                {/* Pin de ejemplo en el mapa */}
-                <div className="position-absolute top-50 start-50 translate-middle text-primary text-center">
-                  <i className="bi bi-geo-alt-fill fs-2 drop-shadow" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.5))' }}></i>
-                  <div className="bg-dark text-white small px-2 py-1 rounded shadow mt-1 border border-white border-opacity-10 fw-medium">Unidad #MX-9021</div>
-                </div>
+                <MapContainer
+                  center={[20.66, -101.35]}
+                  zoom={13}
+                  style={{
+                    height: "100%",
+                    width: "100%"
+                  }}
+                >
+                  <TileLayer
+                    attribution="&copy; OpenStreetMap contributors"
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                </MapContainer>
               </div>
             </div>
 

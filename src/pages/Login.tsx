@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { loginUser } from '../services/auth.service';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -6,7 +7,7 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -14,7 +15,16 @@ export default function Login() {
       setError('Por favor, completa todos los campos.');
       return;
     }
-    console.log('Login exitoso', { email, password, rememberMe });
+
+    try {
+      const res = await loginUser({ email, password });
+
+      console.log('✅ LOGIN CORRECTO:', res.data);
+
+    } catch (err) {
+      console.log('❌ LOGIN FALLÓ');
+      setError('Credenciales incorrectas');
+    }
   };
 
   return (
@@ -32,10 +42,13 @@ export default function Login() {
         zIndex: 1000 
       }}
     >
-      {/* Capa de superposición oscura sutil */}
-      <div className="position-absolute top-0 start-0 w-100 h-100" style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', zIndex: 1 }}></div>
+      {/* Overlay */}
+      <div 
+        className="position-absolute top-0 start-0 w-100 h-100" 
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', zIndex: 1 }} 
+      />
 
-      {/* Tarjeta Glassmorphism Ensanchada */}
+      {/* Card */}
       <div 
         className="card p-4 p-sm-5 text-white border border-white border-opacity-25 shadow-lg position-relative" 
         style={{ 
@@ -48,9 +61,9 @@ export default function Login() {
           WebkitBackdropFilter: 'blur(20px)',
         }}
       >
-        {/* Encabezado */}
+        {/* Header */}
         <div className="text-center mb-5">
-          <h1 className="fw-bolder tracking-tight mb-1" style={{
+          <h1 className="fw-bolder mb-1" style={{
             background: 'linear-gradient(90deg, #ffffff 0%, #ffffff 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -60,108 +73,96 @@ export default function Login() {
           }}>
             MexTrip
           </h1>
-          <p className="text-white-50 small text-uppercase fw-semibold tracking-wider mb-0" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <p className="text-white-50 small text-uppercase fw-semibold">
             Sistema de Monitoreo Geográfico
           </p>
         </div>
 
-        {/* Alerta de Error */}
+        {/* Error */}
         {error && (
-          <div className="alert alert-danger text-center py-2 border-0 bg-danger bg-opacity-25 text-white small mb-4 d-flex align-items-center justify-content-center" style={{ borderRadius: '15px' }}>
-            <i className="bi bi-exclamation-triangle-fill me-2"></i> {error}
+          <div className="alert alert-danger text-center py-2 bg-danger bg-opacity-25 text-white small mb-4">
+            {error}
           </div>
         )}
 
-        {/* Formulario */}
+        {/* Form */}
         <form onSubmit={handleSubmit}>
           
-          {/* Campo de Correo Electrónico */}
+          {/* Email */}
           <div className="mb-4 position-relative">
-            <span className="position-absolute top-50 start-0 translate-middle-y ms-3 text-white opacity-50 fs-5">
+            <span className="position-absolute top-50 start-0 translate-middle-y ms-3 text-white opacity-50">
               <i className="bi bi-envelope"></i>
             </span>
+
             <input
               type="email"
-              className="form-control text-white placeholder-white py-3 ps-5 pe-3"
+              className="form-control text-white py-3 ps-5"
               placeholder="Correo electrónico"
-              style={{ 
-                borderRadius: '15px', 
-                fontSize: '15px',
-                backgroundColor: 'rgba(255, 255, 255, 0.07)',
-                border: '1px solid rgba(255, 255, 255, 0.61)'
+              style={{
+                borderRadius: '15px',
+                backgroundColor: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.61)'
               }}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
-          {/* Campo de Contraseña */}
+          {/* Password */}
           <div className="mb-4 position-relative">
-            <span className="position-absolute top-50 start-0 translate-middle-y ms-3 text-white opacity-50 fs-5">
+            <span className="position-absolute top-50 start-0 translate-middle-y ms-3 text-white opacity-50">
               <i className="bi bi-lock"></i>
             </span>
+
             <input
               type="password"
-              className="form-control text-white placeholder-white py-3 ps-5 pe-3"
+              className="form-control text-white py-3 ps-5"
               placeholder="Contraseña"
-              style={{ 
-                borderRadius: '15px', 
-                fontSize: '15px',
-                backgroundColor: 'rgba(255, 255, 255, 0.07)',
-                border: '1px solid rgba(255, 255, 255, 0.61)'
+              style={{
+                borderRadius: '15px',
+                backgroundColor: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.61)'
               }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          {/* Opciones extras: Recordarme y Recuperar */}
-          <div className="d-flex justify-content-between align-items-center mb-4" style={{ fontSize: '14px' }}>
+          {/* Remember */}
+          <div className="d-flex justify-content-between align-items-center mb-4">
             <div className="form-check d-flex align-items-center">
               <input
-                className="form-check-input bg-transparent border-white border-opacity-50 mt-0"
                 type="checkbox"
-                id="rememberCheck"
-                style={{ width: '17px', height: '17px', cursor: 'pointer' }}
+                className="form-check-input bg-transparent border-white"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
-              <label className="form-check-label text-white-50 ms-2" htmlFor="rememberCheck" style={{ cursor: 'pointer' }}>
+              <label className="form-check-label text-white-50 ms-2">
                 Recordarme
               </label>
             </div>
-            <span className="text-white-50 text-decoration-none fw-medium" style={{ cursor: 'pointer' }}>
-              ¿Olvidaste tu contraseña?
-            </span>
           </div>
 
-          {/* Botón de Login Estilo Moderno */}
-          <button 
-            type="submit" 
-            className="btn btn-light w-100 fw-bold py-3 shadow-lg d-flex align-items-center justify-content-center"
-            style={{ 
-              borderRadius: '15px',
-              fontSize: '16px',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              background: '#ffffff',
-              color: '#1e293b'
+          {/* Button */}
+          <button
+            type="submit"
+            className="btn btn-light w-100 fw-bold py-3"
+            style={{
+              borderRadius: '15px'
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            Ingresar a la Plataforma <i className="bi bi-arrow-right-short fs-4 ms-2"></i>
+            Ingresar
           </button>
 
         </form>
 
-        {/* Footer del Registro */}
-        <div className="text-center mt-5">
+        {/* Footer */}
+        <div className="text-center mt-4">
           <p className="text-white-50 small mb-0">
-            ¿No tienes una cuenta activa? <span className="text-white fw-bold text-decoration-underline" style={{ cursor: 'pointer' }}>Regístrate aquí</span>
+            ¿No tienes cuenta? <span className="text-white fw-bold">Regístrate</span>
           </p>
         </div>
-
-      </div> {/* 🌟 Aquí se cierra correctamente la tarjeta card */}
+      </div>
     </div>
   );
 }
