@@ -1,15 +1,19 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Módulos de navegación para la Barra Lateral
+  // 🌟 Agregamos la ruta exacta a cada botón
   const menuItems = [
-    { name: 'Panel Principal', icon: 'bi-grid-1x2-fill', active: true },
-    { name: 'Explorador de Mapas', icon: 'bi-map-fill', active: false },
-    { name: 'Mis Rutas', icon: 'bi-signpost-split-fill', active: false },
-    { name: 'Analíticas', icon: 'bi-bar-chart-line-fill', active: false },
-    { name: 'Configuración', icon: 'bi-gear-fill', active: false },
+    { name: 'Panel Principal', icon: 'bi-grid-1x2-fill', active: true, path: '/dashboard' },
+    { name: 'Explorador de Mapas', icon: 'bi-map-fill', active: false, path: '/map' },
+    { name: 'Unidades (Cars)', icon: 'bi-truck', active: false, path: '/cars' },
+    { name: 'Estaciones', icon: 'bi-building', active: false, path: '/locations' },
+    { name: 'Rutas (Destinations)', icon: 'bi-signpost-split-fill', active: false, path: '/destinations' },
+    { name: 'Productos', icon: 'bi-box-seam-fill', active: false, path: '/products' },
   ];
+
 
   // Datos simulados (Colores ajustados para brillar en fondo oscuro)
   const stats = [

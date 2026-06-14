@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Register() {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -184,7 +186,7 @@ export default function Register() {
         {/* Footer para volver al Login */}
         <div className="text-center mt-4">
           <p className="text-white-50 small mb-0">
-            ¿Ya tienes una cuenta? <span className="text-white fw-bold text-decoration-underline" style={{ cursor: 'pointer' }}>Inicia sesión aquí</span>
+            ¿Ya tienes una cuenta? <span className="text-white fw-bold text-decoration-underline" style={{ cursor: 'pointer' }} onClick={() => navigate('/login')}>Inicia sesión aquí</span>
           </p>
         </div>
 

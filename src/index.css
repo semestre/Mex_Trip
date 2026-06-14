@@ -1,12 +1,17 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 
-/* Opcional: Si quieres que todo el proyecto use esta fuente por defecto */
+:root {
+  /* Aquí puedes definir variables globales si tu proyecto las requiere más adelante */
+}
+
 body {
   font-family: 'Poppins', sans-serif;
-  /* Fuerza a que todos los placeholders en inputs oscuros sean gris claro */
-  input.form-control::placeholder {
-    color: #adb5bd !important;
-    opacity: 1;
-  }
+  background-color: #0b1120; /* Color oscuro base de respaldo mientras cargan las imágenes de fondo */
+}
+
+/* Dejamos la regla del placeholder fuera de body para asegurar una correcta lectura de PostCSS */
+input.form-control::placeholder {
+  color: #adb5bd !important;
+  opacity: 1 !important;
 }
