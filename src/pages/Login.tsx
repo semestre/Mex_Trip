@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/auth.service';
 
-export default function Login() {
+export default function Login({ onLogin }: { onLogin?: () => void }) {
+  const navigate = useNavigate(); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -17,9 +19,13 @@ export default function Login() {
     }
 
     try {
+      // Llamada real a tu backend
       const res = await loginUser({ email, password });
-
       console.log('✅ LOGIN CORRECTO:', res.data);
+      
+      // Avisamos a la App que ya estamos autenticados y redirigimos
+      if (onLogin) onLogin();
+      navigate('/dashboard');
 
     } catch (err) {
       console.log('❌ LOGIN FALLÓ');
@@ -159,7 +165,7 @@ export default function Login() {
         {/* Footer */}
         <div className="text-center mt-4">
           <p className="text-white-50 small mb-0">
-            ¿No tienes cuenta? <span className="text-white fw-bold">Regístrate</span>
+            ¿No tienes cuenta? <span className="text-white fw-bold" style={{ cursor: 'pointer' }} onClick={() => navigate('/register')}>Regístrate</span>
           </p>
         </div>
       </div>
