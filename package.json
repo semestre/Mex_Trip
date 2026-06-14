@@ -2,7 +2,7 @@
   "name": "mextrip",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://saristeidyn.github.io/Mex_Trip",
+  "homepage": "https://semestre.github.io/Mex_Trip",
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
@@ -24,6 +24,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.17.0",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
@@ -32,6 +33,7 @@
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",

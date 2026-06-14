@@ -7,5 +7,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: '/MexTrip/' // replace with your repo name
+  base: '/Mex_Trip/' // replace with your repo name
 })
