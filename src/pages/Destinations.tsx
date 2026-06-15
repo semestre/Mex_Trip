@@ -1,33 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import Sidebar from '../components/Sidebar';
 import { getDestinations, createDestination, deleteDestination } from '../services/destination.service';
 import { getCars } from '../services/car.service';
 
-const createCustomIcon = (color: string) => {
-  return L.divIcon({
-    className: 'custom-leaflet-icon',
-    html: `<div class="bg-${color} text-white rounded-circle d-flex align-items-center justify-content-center shadow-lg" style="width: 32px; height: 32px; border: 2px solid rgba(255,255,255,0.8);">
-             <i class="bi bi-geo-alt-fill fs-6"></i>
-           </div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-    popupAnchor: [0, -16]
-  });
-};
-
 export default function Destinations() {
-  const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [destinations, setDestinations] = useState<any[]>([]);
   const [cars, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -68,7 +49,6 @@ export default function Destinations() {
       setFormData(prev => ({
         ...prev,
         [point]: {
-          ...prev[point as keyof typeof formData],
           [coord]: parseFloat(value)
         }
       }));
