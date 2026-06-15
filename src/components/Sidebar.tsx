@@ -13,7 +13,7 @@ export default function Sidebar() {
     { name: 'DashBorad', icon: 'bi-signpost-split-fill', path: '/destinations' },
     { name: 'Unidades', icon: 'bi-truck', path: '/cars' },
     { name: 'Productos', icon: 'bi-box-seam-fill', path: '/products' },
-    { name: 'Estaciones', icon: 'bi-building', path: '/locations' },
+    { name: 'Destinos', icon: 'bi-building', path: '/destinations' },
     
   ];
 
