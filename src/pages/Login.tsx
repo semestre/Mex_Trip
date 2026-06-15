@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/auth.service';
 
-export default function Login({ onLogin }: { onLogin?: () => void }) {
-  const navigate = useNavigate(); 
+type LoginProps = {
+  onLogin?: (user: { username: string; role: string }) => void;
+};
+
+export default function Login({ onLogin }: LoginProps) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -19,17 +23,24 @@ export default function Login({ onLogin }: { onLogin?: () => void }) {
     }
 
     try {
-      // Llamada real a tu backend
       const res = await loginUser({ email, password });
-      console.log('✅ LOGIN CORRECTO:', res.data);
-      
-      // Avisamos a la App que ya estamos autenticados y redirigimos
-      if (onLogin) onLogin();
-      navigate('/dashboard');
+      const user = res.data?.user;
 
-    } catch (err) {
-      console.log('❌ LOGIN FALLÓ');
-      setError('Credenciales incorrectas');
+      if (!user) {
+        setError('Credenciales incorrectas');
+        return;
+      }
+
+      const userData = {
+        username: user.username || email.split('@')[0],
+        role: 'Admin'
+      };
+
+      if (onLogin) onLogin(userData);
+      navigate('/dashboard');
+    } catch (err: any) {
+      console.log('❌ LOGIN FALLÓ', err);
+      setError(err?.response?.data?.message || 'Credenciales incorrectas');
     }
   };
 

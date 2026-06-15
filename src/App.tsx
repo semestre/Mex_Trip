@@ -1,14 +1,39 @@
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useState } from 'react';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import MapView from './pages/MapView';
 import Products from './pages/Products';
+import Unidades from './pages/Unidades';
+
+const AUTH_KEY = 'mextrip_user';
+
+type UserData = {
+  username: string;
+  role: string;
+};
 
 export default function App() {
-  // Estado simulado de autenticación
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [user, setUser] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(AUTH_KEY);
+    if (stored) {
+      setUser(JSON.parse(stored));
+    }
+
+    const handleLogout = () => setUser(null);
+    window.addEventListener('mextrip-logout', handleLogout);
+    return () => window.removeEventListener('mextrip-logout', handleLogout);
+  }, []);
+
+  const handleLogin = (userData: UserData) => {
+    localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+    setUser(userData);
+  };
+
+  const isAuthenticated = Boolean(user);
 
   return (
     // 🌟 Eliminamos la etiqueta <Router> que causaba el conflicto
@@ -16,7 +41,7 @@ export default function App() {
       {/* ================= RUTAS PÚBLICAS ================= */}
       <Route 
         path="/login" 
-        element={!isAuthenticated ? <Login onLogin={() => setIsAuthenticated(true)} /> : <Navigate to="/dashboard" />} 
+        element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/dashboard" />} 
       />
       <Route 
         path="/register" 
@@ -28,9 +53,15 @@ export default function App() {
         path="/dashboard" 
         element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
       />
+      {/* Temporarily disabled MapView to debug
       <Route 
         path="/map" 
         element={isAuthenticated ? <MapView /> : <Navigate to="/login" />} 
+      />
+      */}
+      <Route 
+        path="/map" 
+        element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
       />
       <Route 
         path="/products" 
@@ -40,7 +71,7 @@ export default function App() {
       {/* 🌟 Vistas pendientes por crear que apuntan al dashboard temporalmente */}
       <Route 
         path="/cars" 
-        element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
+        element={isAuthenticated ? <Unidades /> : <Navigate to="/login" />} 
       />
       <Route 
         path="/locations" 
