@@ -5,6 +5,9 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Sidebar from '../components/Sidebar';
 import { getLocations } from '../services/location.service';
+import { getDestinations } from '../services/destination.service';
+import { getCars } from '../services/car.service';
+import { getProducts } from '../services/product.service';
 
 const createCustomIcon = (color: string) => {
   return L.divIcon({
@@ -23,41 +26,45 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [locations, setLocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [locationCount, setLocationCount] = useState(0);
+  const [destinationCount, setDestinationCount] = useState(0);
+  const [carCount, setCarCount] = useState(0);
+  const [productCount, setProductCount] = useState(0);
   const storedUser = typeof window !== 'undefined' ? localStorage.getItem('mextrip_user') : null;
   const user = storedUser ? JSON.parse(storedUser) : { username: 'Usuario', role: 'Admin' };
 
   useEffect(() => {
-    loadLocations();
+    loadDashboardData();
   }, []);
 
-  const loadLocations = async () => {
+  const loadDashboardData = async () => {
     try {
-      const response = await getLocations();
-      setLocations(response.data || []);
+      const [locRes, destRes, carRes, prodRes] = await Promise.all([
+        getLocations(),
+        getDestinations(),
+        getCars(),
+        getProducts()
+      ]);
+
+      setLocationCount(locRes.data?.length || 0);
+      setDestinationCount(destRes.data?.length || 0);
+      setCarCount(carRes.data?.length || 0);
+      setProductCount(prodRes.data?.length || 0);
+      setLocations(locRes.data || []);
       setLoading(false);
     } catch (err) {
-      console.error('Error loading locations:', err);
+      console.error('Error loading dashboard data:', err);
       setLoading(false);
     }
   };
 
-  // 🌟 Agregamos la ruta exacta a cada botón
-  const menuItems = [
-    { name: 'Panel Principal', icon: 'bi-grid-1x2-fill', active: true, path: '/dashboard' },
-    { name: 'Explorador de Mapas', icon: 'bi-map-fill', active: false, path: '/map' },
-    { name: 'Unidades (Cars)', icon: 'bi-truck', active: false, path: '/cars' },
-    { name: 'Estaciones', icon: 'bi-building', active: false, path: '/locations' },
-    { name: 'Rutas (Destinations)', icon: 'bi-signpost-split-fill', active: false, path: '/destinations' },
-    { name: 'Productos', icon: 'bi-box-seam-fill', active: false, path: '/products' },
-  ];
 
-
-  // Datos simulados (Colores ajustados para brillar en fondo oscuro)
+  // Datos de estadísticas con counts reales de MongoDB
   const stats = [
-    { title: 'Locations', value: '12', icon: 'bi-cursor-fill', color: '#ff4d94', trend: '+2 esta semana', trendColor: 'text-success' },
-    { title: 'Destinos Registrados', value: '45', icon: 'bi-geo-alt-fill', color: '#00e676', trend: '3 nuevos estados', trendColor: 'text-success' },
-    { title: 'Unidades', value: '120', icon: 'bi-people-fill', color: '#4dabf7', trend: '85 activos ahora', trendColor: 'text-info' },
-    { title: 'Productos', value: '0', icon: 'bi-shield-check-fill', color: '#ffca28', trend: 'Sistema seguro', trendColor: 'text-warning' },
+    { title: 'Locations', value: locationCount.toString(), icon: 'bi-cursor-fill', color: '#ff4d94', trend: '+2 esta semana', trendColor: 'text-success' },
+    { title: 'Destinos Registrados', value: destinationCount.toString(), icon: 'bi-geo-alt-fill', color: '#00e676', trend: '3 nuevos estados', trendColor: 'text-success' },
+    { title: 'Unidades', value: carCount.toString(), icon: 'bi-people-fill', color: '#4dabf7', trend: '85 activos ahora', trendColor: 'text-info' },
+    { title: 'Productos', value: productCount.toString(), icon: 'bi-shield-check-fill', color: '#ffca28', trend: 'Sistema seguro', trendColor: 'text-warning' },
   ];
 
   return (
