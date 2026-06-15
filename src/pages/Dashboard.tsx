@@ -1,9 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import Sidebar from '../components/Sidebar';
+import { getLocations } from '../services/location.service';
+
+const createCustomIcon = (color: string) => {
+  return L.divIcon({
+    className: 'custom-leaflet-icon',
+    html: `<div class="bg-${color} text-white rounded-circle d-flex align-items-center justify-content-center shadow-lg" style="width: 32px; height: 32px; border: 2px solid rgba(255,255,255,0.8);">
+             <i class="bi bi-geo-alt-fill fs-6"></i>
+           </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16]
+  });
+};
+
 export default function Dashboard() {
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [locations, setLocations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('mextrip_user') : null;
+  const user = storedUser ? JSON.parse(storedUser) : { username: 'Usuario', role: 'Admin' };
+
+  useEffect(() => {
+    loadLocations();
+  }, []);
+
+  const loadLocations = async () => {
+    try {
+      const response = await getLocations();
+      setLocations(response.data || []);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error loading locations:', err);
+      setLoading(false);
+    }
+  };
 
   // 🌟 Agregamos la ruta exacta a cada botón
   const menuItems = [
@@ -18,10 +54,10 @@ export default function Dashboard() {
 
   // Datos simulados (Colores ajustados para brillar en fondo oscuro)
   const stats = [
-    { title: 'Viajes Activos', value: '12', icon: 'bi-cursor-fill', color: '#ff4d94', trend: '+2 esta semana', trendColor: 'text-success' },
+    { title: 'Locations', value: '12', icon: 'bi-cursor-fill', color: '#ff4d94', trend: '+2 esta semana', trendColor: 'text-success' },
     { title: 'Destinos Registrados', value: '45', icon: 'bi-geo-alt-fill', color: '#00e676', trend: '3 nuevos estados', trendColor: 'text-success' },
-    { title: 'Usuarios en Ruta', value: '120', icon: 'bi-people-fill', color: '#4dabf7', trend: '85 activos ahora', trendColor: 'text-info' },
-    { title: 'Alertas del Sistema', value: '0', icon: 'bi-shield-check-fill', color: '#ffca28', trend: 'Sistema seguro', trendColor: 'text-warning' },
+    { title: 'Unidades', value: '120', icon: 'bi-people-fill', color: '#4dabf7', trend: '85 activos ahora', trendColor: 'text-info' },
+    { title: 'Productos', value: '0', icon: 'bi-shield-check-fill', color: '#ffca28', trend: 'Sistema seguro', trendColor: 'text-warning' },
   ];
 
   return (
@@ -46,8 +82,7 @@ export default function Dashboard() {
           <header className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-white border-opacity-10">
             <div>
               <h2 className="fw-extrabold m-0 tracking-tight text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Panel Principal</h2>
-              {/* 🌟 MEJORA UX 2: Opacidad 75 en lugar de text-white-50 para que no se pierda */}
-              <p className="opacity-75 small mb-0 fw-medium">Bienvenido de nuevo, rastreo de rutas activo.</p>
+              <p className="opacity-75 small mb-0 fw-medium">Bienvenido de nuevo, {user.username} ({user.role})</p>
             </div>
             
             <div className="d-flex align-items-center gap-3">
@@ -126,70 +161,45 @@ export default function Dashboard() {
                 }}
               >
                 <div className="card-header bg-transparent border-bottom border-white border-opacity-10 py-3 px-4 d-flex justify-content-between align-items-center">
-                  <h5 className="m-0 fw-bold text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Monitoreo de Unidades</h5>
+                  <h5 className="m-0 fw-bold text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Mapa De Ubicaciones</h5>
                   <button className="btn btn-outline-light btn-sm opacity-75 hover-opacity-100 px-3 border-opacity-25" style={{ borderRadius: '8px' }}>
-                    <i className="bi bi-sliders me-1"></i> Filtros
+                    <i className="bi bi-crosshair me-1"></i> Mi Ubicación
                   </button>
                 </div>
                 
-                <div className="card-body p-0 table-responsive flex-grow-1">
-                  <table className="table table-borderless text-white align-middle mb-0">
-                    <thead style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)', fontSize: '12px' }} className="opacity-75 text-uppercase fw-bold sticky-top">
-                      <tr>
-                        <th className="py-3 px-4">Código</th>
-                        <th className="py-3">Punto de Origen</th>
-                        <th className="py-3">Destino Actual</th>
-                        <th className="py-3">Estado Operativo</th>
-                        <th className="py-3 px-4 text-end">Progreso Global</th>
-                      </tr>
-                    </thead>
-                    <tbody style={{ fontSize: '14.5px' }}>
-                      <tr className="border-bottom border-white border-opacity-10">
-                        <td className="py-3 px-4 fw-bold text-primary">#MX-9021</td>
-                        <td className="py-3 fw-medium">CDMX</td>
-                        <td className="py-3 fw-medium">León, Gto.</td>
-                        {/* 🌟 MEJORA UX 4: Badges sólidos para destacar inmediatamente el estado */}
-                        <td className="py-3"><span className="badge bg-success text-white px-3 py-2 shadow-sm" style={{ borderRadius: '6px' }}>En Ruta</span></td>
-                        <td className="py-3 px-4">
-                          <div className="d-flex align-items-center justify-content-end gap-3">
-                            <div className="progress w-50 bg-dark" style={{ height: '8px', borderRadius: '10px' }}>
-                              <div className="progress-bar bg-success" role="progressbar" style={{ width: '75%', borderRadius: '10px' }}></div>
+                {loading ? (
+                  <div className="d-flex align-items-center justify-content-center flex-grow-1">
+                    <p className="text-white-50">Cargando mapa...</p>
+                  </div>
+                ) : (
+                  <div className="card-body p-0 flex-grow-1 overflow-hidden" style={{ height: '100%' }}>
+                    <MapContainer
+                      center={[21.1219, -101.6826]}
+                      zoom={6}
+                      style={{ height: '100%', width: '100%', backgroundColor: '#0f172a' }}
+                    >
+                      <TileLayer
+                        attribution='&copy; <a href="https://carto.com/">CartoDB</a>'
+                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                      />
+                      {locations.map((loc) => (
+                        <Marker
+                          key={loc._id}
+                          position={[loc.latitude, loc.longitude]}
+                          icon={createCustomIcon('primary')}
+                        >
+                          <Popup className="custom-popup">
+                            <div className="text-dark">
+                              <h6 className="fw-bold mb-1">{loc.name}</h6>
+                              <p className="mb-1 small">{loc.description || 'Sin descripción'}</p>
+                              <small>Lat: {loc.latitude}, Lng: {loc.longitude}</small>
                             </div>
-                            <span className="fw-bold">75%</span>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr className="border-bottom border-white border-opacity-10">
-                        <td className="py-3 px-4 fw-bold text-primary">#MX-8832</td>
-                        <td className="py-3 fw-medium">Guadalajara</td>
-                        <td className="py-3 fw-medium">Monterrey</td>
-                        <td className="py-3"><span className="badge bg-warning text-dark px-3 py-2 shadow-sm" style={{ borderRadius: '6px' }}>Demorado</span></td>
-                        <td className="py-3 px-4">
-                          <div className="d-flex align-items-center justify-content-end gap-3">
-                            <div className="progress w-50 bg-dark" style={{ height: '8px', borderRadius: '10px' }}>
-                              <div className="progress-bar bg-warning" role="progressbar" style={{ width: '15%', borderRadius: '10px' }}></div>
-                            </div>
-                            <span className="fw-bold">15%</span>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="py-3 px-4 fw-bold text-primary">#MX-7741</td>
-                        <td className="py-3 fw-medium">Cancún</td>
-                        <td className="py-3 fw-medium">Mérida</td>
-                        <td className="py-3"><span className="badge bg-secondary text-white px-3 py-2 shadow-sm" style={{ borderRadius: '6px' }}>Arribado</span></td>
-                        <td className="py-3 px-4">
-                          <div className="d-flex align-items-center justify-content-end gap-3">
-                            <div className="progress w-50 bg-dark" style={{ height: '8px', borderRadius: '10px' }}>
-                              <div className="progress-bar bg-info" role="progressbar" style={{ width: '100%', borderRadius: '10px' }}></div>
-                            </div>
-                            <span className="fw-bold">100%</span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                          </Popup>
+                        </Marker>
+                      ))}
+                    </MapContainer>
+                  </div>
+                )}
               </div>
             </div>
           </div>

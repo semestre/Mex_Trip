@@ -1,28 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-// 🌟 Agregamos la propiedad onLogout para comunicarnos con el estado global de App.tsx
-interface SidebarProps {
-  onLogout?: () => void;
-}
+const AUTH_KEY = 'mextrip_user';
 
-export default function Sidebar({ onLogout }: SidebarProps) {
+export default function Sidebar() {
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // 🌟 Reducido estrictamente a tus 4 vistas requeridas para el proyecto
   const menuItems = [
-    { name: 'Rutas', icon: 'bi-signpost-split-fill', path: '/destinations' },
+    { name: 'DashBorad', icon: 'bi-signpost-split-fill', path: '/destinations' },
     { name: 'Unidades', icon: 'bi-truck', path: '/cars' },
     { name: 'Productos', icon: 'bi-box-seam-fill', path: '/products' },
     { name: 'Estaciones', icon: 'bi-building', path: '/locations' },
+    
   ];
 
   const handleLogoutClick = () => {
-    console.log("Cerrando sesión...");
-    if (onLogout) onLogout(); // Cambia isAuthenticated a false en App.tsx
-    navigate('/login'); // Redirecciona inmediatamente al login público
+    console.log('Cerrando sesión...');
+    localStorage.removeItem(AUTH_KEY);
+    window.dispatchEvent(new Event('mextrip-logout'));
+    navigate('/login');
   };
 
   return (
@@ -87,8 +86,30 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           </div>
           {sidebarOpen && (
             <div className="overflow-hidden">
-              <h6 className="m-0 fw-semibold text-truncate text-white" style={{ fontSize: '14px' }}>Hassiel Avila</h6>
-              <span className="text-info small fw-medium">Admin</span>
+              <h6 className="m-0 fw-semibold text-truncate text-white" style={{ fontSize: '14px' }}>
+                {(() => {
+                  const stored = localStorage.getItem(AUTH_KEY);
+                  if (!stored) return 'Invitado';
+                  try {
+                    const parsed = JSON.parse(stored);
+                    return parsed.username || 'Invitado';
+                  } catch {
+                    return 'Invitado';
+                  }
+                })()}
+              </h6>
+              <span className="text-info small fw-medium">
+                {(() => {
+                  const stored = localStorage.getItem(AUTH_KEY);
+                  if (!stored) return 'Usuario';
+                  try {
+                    const parsed = JSON.parse(stored);
+                    return parsed.role || 'Admin';
+                  } catch {
+                    return 'Usuario';
+                  }
+                })()}
+              </span>
             </div>
           )}
         </div>
