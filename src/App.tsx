@@ -8,7 +8,7 @@ import Products from './pages/Products';
 
 export default function App() {
   // Estado simulado de autenticación
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   return (
     // 🌟 Eliminamos la etiqueta <Router> que causaba el conflicto
