@@ -14,7 +14,6 @@ export default function Products() {
   const [productsData, setProductsData] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -25,10 +24,10 @@ export default function Products() {
     try {
       const response = await getProducts();
       setProductsData(response.data || []);
-      setErrorMessage(null);
+      // setErrorMessage(null);
     } catch (error) {
       console.error('Error loading products:', error);
-      setErrorMessage('No se pudo cargar los productos desde la base de datos.');
+      // setErrorMessage('No se pudo cargar los productos desde la base de datos.');
     }
   };
 
@@ -49,20 +48,19 @@ export default function Products() {
     };
 
     if (!productPayload.name || !productPayload.price || !productPayload.image) {
-      setErrorMessage('Nombre, precio e imagen son obligatorios.');
+      // setErrorMessage('Nombre, precio e imagen son obligatorios.');
       return;
     }
 
     try {
       setSaving(true);
-      setErrorMessage(null);
+      // setErrorMessage(null);
       await createProduct(productPayload);
       setIsModalOpen(false);
       event.currentTarget.reset();
       await loadProducts();
     } catch (error) {
       console.error('Error saving product:', error);
-      setErrorMessage('Error guardando el producto. Intenta de nuevo.');
     } finally {
       setSaving(false);
     }

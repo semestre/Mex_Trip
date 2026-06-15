@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import MapView from './pages/MapView';
 import Products from './pages/Products';
 import Unidades from './pages/Unidades';
 import Destinations from './pages/Destinations';
