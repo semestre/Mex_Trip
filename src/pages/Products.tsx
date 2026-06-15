@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
 
 export default function Products() {
   const navigate = useNavigate();
@@ -44,64 +45,7 @@ export default function Products() {
     >
       <div className="d-flex w-100 min-vh-100" style={{ backgroundColor: 'rgba(5, 10, 20, 0.85)', backdropFilter: 'blur(12px)' }}>
         
-        {/* SIDEBAR */}
-        <aside 
-          className="p-3 border-end border-white border-opacity-10 d-flex flex-column transition-all shadow-lg z-3"
-          style={{ 
-            width: sidebarOpen ? '260px' : '85px', 
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            backgroundColor: 'rgba(15, 23, 42, 0.6)', 
-            backdropFilter: 'blur(20px)'
-          }}
-        >
-          <div className={`d-flex align-items-center ${sidebarOpen ? 'justify-content-between' : 'justify-content-center'} mb-4 px-2`}>
-            {sidebarOpen && (
-              <div className="d-flex align-items-center gap-2">
-                <i className="bi bi-airplane-fill text-white fs-4" style={{ transform: 'rotate(45deg)' }}></i>
-                <h4 className="m-0 fw-extrabold tracking-tight text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>MexTrip</h4>
-              </div>
-            )}
-            <button 
-              className="btn btn-sm btn-outline-light border-0 opacity-75 hover-opacity-100"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              <i className={`bi ${sidebarOpen ? 'bi-chevron-left' : 'bi-list fs-4'}`}></i>
-            </button>
-          </div>
-
-          <div className="d-flex flex-column gap-2 flex-grow-1 mt-3 overflow-auto custom-scrollbar">
-            {menuItems.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => navigate(item.path)}
-                className={`btn text-start text-white border-0 d-flex align-items-center gap-3 p-3 w-100 transition-all ${
-                  item.active ? 'bg-primary bg-opacity-25 fw-bold border-start border-primary border-4' : 'bg-transparent opacity-75'
-                }`}
-                style={{ 
-                    borderRadius: item.active ? '0 16px 16px 0' : '16px', 
-                    fontFamily: "'Poppins', sans-serif", 
-                    fontSize: '14px', 
-                    boxShadow: 'none' 
-                }}
-              >
-                <i className={`bi ${item.icon} fs-5 ${item.active ? 'text-primary' : ''}`}></i>
-                {sidebarOpen && <span className="animate__animated animate__fadeIn text-nowrap">{item.name}</span>}
-              </button>
-            ))}
-          </div>
-
-          <div className="pt-3 border-top border-white border-opacity-10 d-flex align-items-center gap-3 px-2 mt-2">
-            <div className="bg-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '42px', height: '42px' }}>
-              <i className="bi bi-person-fill fs-5 text-white"></i>
-            </div>
-            {sidebarOpen && (
-              <div className="overflow-hidden">
-                <h6 className="m-0 fw-semibold text-truncate text-white" style={{ fontSize: '14px' }}>Hassiel Avila</h6>
-                <span className="text-info small fw-medium">Admin</span>
-              </div>
-            )}
-          </div>
-        </aside>
+        <Sidebar />
 
         {/* CONTENIDO PRINCIPAL */}
         <div className="flex-grow-1 d-flex flex-column h-100 overflow-auto p-3 p-md-4 pb-5">
