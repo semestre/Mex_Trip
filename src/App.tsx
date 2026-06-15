@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import MapView from './pages/MapView';
 import Products from './pages/Products';
 import Unidades from './pages/Unidades';
+import Destinations from './pages/Destinations';
 
 const AUTH_KEY = 'mextrip_user';
 
@@ -79,7 +80,7 @@ export default function App() {
       />
       <Route 
         path="/destinations" 
-        element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
+        element={isAuthenticated ? <Destinations /> : <Navigate to="/login" />} 
       />
 
       {/* Redirección por defecto */}
