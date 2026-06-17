@@ -1,7 +1,7 @@
 const app = require("./app");
 const connectDB = require("./config/database");
 
-const PORT = 3000;
+const PORT = 5000;
 
 // Connect MongoDB
 connectDB();
